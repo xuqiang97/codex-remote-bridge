@@ -2,7 +2,7 @@
 
 Continue a local Codex conversation from a trusted chat channel when you are away from the computer.
 
-> **Status:** architecture/specification stage. V1 is intentionally not implemented yet. The next coding agent should follow `AGENTS.md` and the documents under `docs/`.
+> **Status: No-Go on the tested Windows environment (2026-09-20).** A completed, idle Desktop test thread could be read by a separate app-server, but `thread/resume` failed twice with `already has an active writer`. Full V1 development is stopped pending architecture discussion. See [the actual validation record](docs/VALIDATION.md). There is no installable bridge or DingTalk integration yet.
 
 ## Why this project exists
 
@@ -67,7 +67,7 @@ The most important assumption must be validated before building the full bridge:
 
 The implementation agent must test this first.
 
-If that handoff does **not** work reliably, do not fake it. Record the result and fall back to supporting only threads created/managed by the bridge until a supported handoff is available.
+If that handoff does **not** work reliably, do not fake it. Record the result and stop implementation for an owner-led architecture discussion. Supporting only bridge-managed threads would change V1's scope and requires an explicit decision; it is not an automatic fallback.
 
 ## V1 user interaction
 
