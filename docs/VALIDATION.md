@@ -50,9 +50,10 @@ candidate files and all 11 pre-implementation commits for the actual local secre
 user-ID and personal-path values plus common key patterns: no matches. This is
 a bounded scan, not a guarantee that every possible sensitive string is detected.
 After implementation commit, the same bounded audit scanned all 12 commits with
-no matches. GitHub Actions API reports zero runs; the workflow has not been
-remotely validated. Actual push of the implementation was rejected with HTTP 403
-because the locally authenticated account lacks repository write permission.
+no matches. The initial push was rejected with HTTP 403 while the repository
+invitation was pending. On 2026-09-21, the owner-authorized invitation was accepted,
+write permission was verified, and main was pushed successfully. All four public
+CI jobs passed for fa24d4487cb22f8a8fd87ff4d5dc11984c6eea8e; see Gate C.
 
 The offline suite now covers coordinator creation/reuse, structured stable RPC
 shapes, read-only policy, filtered history, query-vs-dispatch safety, unique targets,
@@ -267,12 +268,14 @@ Record:
 
 ## Gate C — Public CI
 
-**Status:** Pending
+**Status:** PASS on 2026-09-21.
 
-The workflow now exists at `.github/workflows/ci.yml`, with the required matrix.
-It has not run on GitHub: a fresh push preflight still returns HTTP 403 for the
-locally authenticated account. Do not infer passing CI from local tests.
-The last checked public Actions runs API returned zero workflow runs.
+[GitHub Actions run 35572523769](https://github.com/xuqiang97/codex-remote-bridge/actions/runs/35572523769)
+completed successfully for commit `fa24d4487cb22f8a8fd87ff4d5dc11984c6eea8e`.
+All four jobs passed: Windows/macOS latest with Python 3.10/3.14.
+The workflow installs dependencies, runs the offline unittest suite, compiles
+Python sources and checks Git whitespace. These results are actual remote CI
+evidence, not a substitute for macOS live DingTalk/Desktop acceptance.
 
 Required matrix:
 
@@ -415,11 +418,12 @@ the coordinator update and Gate B for its current validation status.
 
 ### Publication
 
-GitHub push preflight and the actual post-commit push both returned HTTP 403: the locally authenticated account does
-not have write access to the repository. Credentials were not printed, changed,
-or committed. The owner must grant repository write access or authenticate an
-authorized account locally before publication can complete. No fork, pull request,
-or history rewrite was used to bypass the requested destination.
+Initial GitHub pushes returned HTTP 403 because repository write access was not
+yet active. On 2026-09-21, at the user's explicit request, the matching pending
+repository invitation was accepted through the official API (HTTP 204). The
+authenticated account then had push permission. All three pending local commits
+were pushed to origin/main, ending at `fa24d44`; the CI matrix passed. Credentials
+were neither printed nor committed. No fork or history rewrite was used.
 
 Confirm:
 
