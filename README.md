@@ -109,7 +109,7 @@ cp .env.example .env
 
 列表五分钟过期，重新 `/threads` 即可。普通文字始终进入总助理；回复开始状态与最终结果，不逐 token 刷屏。忙碌时拒绝，不排队、不自动 steer。最多扫描 10,000 条记录，超出会拒绝，避免产生不完整的可选择列表。
 
-首次验收在安全仓库的 Desktop 任务里完成无风险对话，再让钉钉总助理查询它，并明确派发一个无风险跟进。确认正确后再发工作指令。远程 SSH 主机任务、云任务和未授权目录不属于本机 V1 范围。
+首次验收在安全仓库的 Desktop 任务里完成无风险对话，再让钉钉总助理查询它，并明确派发一个无风险跟进。确认正确后再发工作指令。云任务和未授权目录仍不支持；固定 SSH 主机可按下面的显式配置接入。
 
 ### Desktop writer 限制
 
@@ -150,3 +150,16 @@ git diff --check
 参考：[官方 App Server](https://learn.chatgpt.com/docs/app-server)、[官方 DingTalk Python SDK](https://github.com/open-dingtalk/dingtalk-stream-sdk-python)、[安全模型](docs/SECURITY.md)、[验证记录](docs/VALIDATION.md)。
 
 MIT License.
+
+## 可选：访问固定 SSH 主机的任务
+
+在本机 `.env` 配置 `CODEX_SSH_REMOTES`（JSON 数组），每项包含 `alias`、
+`host`、`command`、`home`、`roots`。示例见 `.env.example`；每位用户填写自己的
+SSH 配置别名、Codex 可执行路径、相同用户的 Codex Home 和项目目录。
+需要本机 OpenSSH、远端 Python 3/Codex，以及已验证的 SSH 主机密钥和非交互登录。
+
+仍只有本机一份钉钉 Stream 连接。Bridge 通过 SSH stdio 启动远端 app-server，
+不公开端口，不复制钉钉凭据，不安装远端机器人服务。远端根目录在远端解析并检查。
+`/threads` 显示主机标签；正常聊天可直接询问远端项目或用准确任务名派发。
+同名任务不猜测，其他客户端占用时拒绝执行。远端断连时目录查询会明确失败，
+不会把不完整结果说成“所有任务”。启用前请完成文档中的安全环境验证。

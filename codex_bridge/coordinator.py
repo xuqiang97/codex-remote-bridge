@@ -110,12 +110,12 @@ class Coordinator(Router):
             result = await self.app.thread_list(cursor)
             for thread in result.get('data', []):
                 tid = thread.get('id')
-                root = allowed_path(thread.get('cwd'), self.config.roots)
+                root = self.path_for(thread)
                 if root and tid and tid not in excluded and tid not in entries:
                     if len(entries) >= 200:
                         raise AppError('Allowed task catalog too large')
                     entries[tid] = {'ref':f'T{len(entries)+1}', 'title':self.render(thread.get('name') or '未命名任务')[:120],
-                                    'project':self.render(root.name), 'updated_at':thread.get('updatedAt'),
+                                    'project':self.render(root.name), 'host':thread.get('host','local'), 'updated_at':thread.get('updatedAt'),
                                     'status':'本 Bridge 正在执行' if tid in self.active else '全局执行状态未知'}
             cursor = result.get('nextCursor')
             if not cursor:
@@ -128,7 +128,7 @@ class Coordinator(Router):
     async def history(self, tid):
         await self.checked(tid)
         thread = await self.app.thread_read(tid, include_turns=True)
-        if not allowed_path(thread.get('cwd'), self.config.roots):
+        if not self.path_for(thread):
             raise AppError('Root changed')
         result = []
         for turn in thread.get('turns', [])[-3:]:
@@ -147,7 +147,7 @@ class Coordinator(Router):
             if thread['status']['type'] == 'active':
                 raise BusyError()
             resumed = await self.app.thread_resume(tid, coordinator=True)
-            if resumed.get('status',{}).get('type') != 'idle' or allowed_path(resumed.get('cwd'), self.config.roots) != cwd:
+            if resumed.get('status',{}).get('type') != 'idle' or self.path_for(resumed) != cwd:
                 raise AppError('Invalid coordinator resume')
             return tid, cwd
         cwd = self.config.roots[0]
@@ -155,7 +155,7 @@ class Coordinator(Router):
         thread = await self.app.coordinator_start(cwd, INSTRUCTIONS)
         tid = thread['id']
         self.state.set_coordinator(key, self.senders[key], tid)
-        if allowed_path(thread.get('cwd'), self.config.roots) != cwd:
+        if self.path_for(thread) != cwd:
             raise AppError('Coordinator root mismatch')
         await self.app.coordinator_name(tid)
         return tid, cwd
@@ -242,7 +242,7 @@ class Coordinator(Router):
             if thread['status']['type'] == 'active':
                 raise BusyError()
             resumed = await self.app.thread_resume(tid)
-            if resumed.get('status',{}).get('type') != 'idle' or allowed_path(resumed.get('cwd'), self.config.roots) != cwd:
+            if resumed.get('status',{}).get('type') != 'idle' or self.path_for(resumed) != cwd:
                 raise AppError('Invalid target resume')
             job = self.state.dispatch(key, tid)
             turn_id, done = await self.app.turn_start(tid, instruction, cwd)

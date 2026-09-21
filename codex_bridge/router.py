@@ -37,9 +37,14 @@ class Router:
                 and len(msg.message_id) <= 512 and len(msg.conversation_id) <= 512
                 and (not self.config.conversations or msg.conversation_id in self.config.conversations))
 
+    def path_for(self, thread):
+        resolver = getattr(self.app, 'path_for', None)
+        return resolver(thread) if resolver else allowed_path(thread.get('cwd'), self.config.roots)
+
     def render(self, text):
         secrets = (self.config.client_id, self.config.client_secret, *self.config.users,
-                   *self.config.conversations, *(str(p) for p in self.config.roots))
+                   *self.config.conversations, *(str(p) for p in self.config.roots),
+                   *(value for remote in getattr(self.config, 'remotes', ()) for value in (remote.host,remote.home,remote.command,*remote.roots)))
         return safe_text(text, self.config.max_output, secrets)
 
     async def handle(self, msg, send):
@@ -66,7 +71,7 @@ class Router:
 
     async def checked(self, tid):
         thread = await self.app.thread_read(tid)
-        path = allowed_path(thread.get('cwd'), self.config.roots)
+        path = self.path_for(thread)
         if not path:
             raise AppError('Thread outside allowed roots')
         status = thread.get('status', {}).get('type')
@@ -105,11 +110,11 @@ class Router:
                 for _ in range(100):
                     result = await self.app.thread_list(cursor)
                     for thread in result.get('data', []):
-                        path = allowed_path(thread.get('cwd'), self.config.roots)
+                        path = self.path_for(thread)
                         if path and thread.get('id') and thread['id'] not in ids:
                             ids.add(thread['id'])
                             label = self.render(thread.get('name') or '未命名任务')[:60]
-                            entries.append((thread['id'], path.name, label))
+                            entries.append((thread['id'], (thread.get('host','local') + ':' + path.name), label))
                     cursor = result.get('nextCursor')
                     if not cursor:
                         break
@@ -170,7 +175,7 @@ class Router:
             if thread['status']['type'] == 'active':
                 raise BusyError()
             resumed = await self.app.thread_resume(tid)  # Server's writer lock is authoritative.
-            resumed_path = allowed_path(resumed.get('cwd'), self.config.roots)
+            resumed_path = self.path_for(resumed)
             if resumed_path != path or resumed.get('status', {}).get('type') != 'idle':
                 raise AppError('Resume did not produce the expected idle workspace')
             turn_id, done = await self.app.turn_start(tid, text, path)

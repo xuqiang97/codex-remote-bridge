@@ -1,12 +1,53 @@
 import json
 import os
 import shutil
+import re
 from dataclasses import dataclass
 from pathlib import Path
+from pathlib import PurePosixPath
 
 
 class ConfigError(ValueError):
     pass
+
+
+@dataclass(frozen=True, repr=False)
+class RemoteConfig:
+    alias: str
+    host: str
+    command: str
+    home: str
+    roots: tuple
+
+
+def remote_configs(raw):
+    try:
+        values = json.loads(raw)
+        if not isinstance(values, list) or len(values) > 4:
+            raise ValueError()
+        result, aliases = [], set()
+        for entry in values:
+            if not isinstance(entry, dict) or set(entry) != {'alias','host','command','home','roots'}:
+                raise ValueError()
+            alias, host = entry['alias'], entry['host']
+            if not isinstance(alias,str) or not re.fullmatch(r'[a-zA-Z0-9_-]{1,24}',alias) or alias == 'local' or alias in aliases:
+                raise ValueError()
+            if not isinstance(host,str) or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}',host):
+                raise ValueError()
+            roots = entry['roots']
+            if not isinstance(roots,list) or not 1 <= len(roots) <= 32:
+                raise ValueError()
+            for value in [entry['command'],entry['home'],*roots]:
+                if not isinstance(value,str) or not value or len(value)>4096 or any(ord(c)<32 for c in value):
+                    raise ValueError()
+                p=PurePosixPath(value)
+                if not p.is_absolute() or '..' in p.parts or str(p)=='/' or value.startswith('//'):
+                    raise ValueError()
+            aliases.add(alias)
+            result.append(RemoteConfig(alias,host,entry['command'],entry['home'],tuple(roots)))
+        return tuple(result)
+    except (ValueError,KeyError,TypeError):
+        raise ConfigError('Invalid fixed SSH remote configuration') from None
 
 
 def load_env(path):
@@ -39,6 +80,7 @@ class Config:
     codex_home: str = ''
     max_input: int = 4000
     max_output: int = 3000
+    remotes: tuple = ()
 
     @classmethod
     def load(cls, directory, env=None):
@@ -77,6 +119,9 @@ class Config:
         state = Path(e.get('BRIDGE_STATE_PATH', '.data/bridge.db'))
         if not state.is_absolute():
             state = directory / state
+        remotes = remote_configs(e.get('CODEX_SSH_REMOTES','[]'))
+        if remotes and not shutil.which('ssh'):
+            raise ConfigError('OpenSSH is required for configured remotes')
         return cls(e['DINGTALK_CLIENT_ID'], e['DINGTALK_CLIENT_SECRET'], users,
                    frozenset(x.strip() for x in e.get('DINGTALK_ALLOWED_CONVERSATION_IDS', '').split(',') if x.strip()),
-                   tuple(roots), command, state, e.get('CODEX_HOME', ''), max_input, max_output)
+                   tuple(roots), command, state, e.get('CODEX_HOME', ''), max_input, max_output, remotes)

@@ -1,5 +1,22 @@
 # AGENTS.md
 
+## Owner-approved fixed SSH extension — 2026-09-21
+
+The owner explicitly requested access to recent projects on the connected remote
+host as well as local projects. A single local DingTalk consumer may therefore
+connect to explicitly configured remote Codex instances over SSH stdio. This is a
+narrow exception to the original local-only boundary, not multiple competing bot
+consumers or a cloud relay. Configuration and host choice are local-only.
+
+Require known SSH host keys, noninteractive authentication, no agent forwarding,
+no port forwarding/listeners, a fixed Codex command/home and explicit remote root
+allowlists. Validate cwd/symlinks on the remote OS before returning history and
+again before work. Namespace task IDs by host. Keep the coordinator local. Retain
+approval denial, sandbox policy, writer-lock checks, dedupe and owned-stop rules.
+Never let chat supply a host, command, credential or arbitrary path. Do not alter
+remote Codex storage, upgrade it automatically or interrupt another client.
+
+
 ## Owner-approved scope revision — 2026-09-21
 
 The owner replaced manual task-switching as the primary experience. Each authorized

@@ -1,5 +1,44 @@
 # Validation Record
 
+## Fixed SSH extension validation — 2026-09-21
+
+The owner requested access to recent local projects and the connected remote host.
+Personal roots, addresses and Codex Home remain solely in ignored local configuration.
+No credentials or private paths are needed in the public implementation.
+
+- Local configuration was extended to the recent saved image/video projects,
+  retaining the original project and disposable fixture.
+- Remote SSH noninteractive login with strict known-host verification succeeded.
+  Codex CLI/app-server version is 0.153.4, Python is 3.10.12. Process inspection
+  confirmed the same OS user and Codex Home as the existing remote app-server.
+- A separate SSH stdio client completed initialize/list/read and read a known
+  stored Desktop task. First page contained 39 remote task records.
+- A known idle stored Desktop task resumed successfully. A second independent
+  client was refused while the first held its writer. Neither probe started a
+  turn or changed project files in that existing production workspace.
+- In a new disposable remote Git directory, a bridge-created test task remembered
+  a conversation-only codeword/integer. After closing and restarting the SSH
+  client, resume/turn-start returned the exact expected codeword/arithmetic and
+  created the one requested file with exact contents. No approval was accepted.
+  This proves the remote sandbox execution path, not a production-project canary.
+- The production backend catalog/native path validator returned 70 allowed local
+  records (including coordinator/test records) and 32 remote records across the
+  three explicitly configured remote projects. A remote task's persisted history
+  was read through the same production backend, after remote canonicalization.
+- The bridge was restarted with the new configuration; DingTalk Stream reconnected.
+  Await user confirmation for an actual DingTalk query of the remote project.
+- All 56 offline tests passed locally, including the remote path helper, traversal/
+  symlink escapes, host-qualified IDs, unknown-host refusal, no history before
+  authorization, revalidation before turn and fixed SSH argv without forwarding.
+  Compile and whitespace checks passed. CI for this extension is pending push.
+
+Remote task execution remains subject to writer ownership, conservative sandbox,
+approval denial and per-thread locks. Identically named tasks across hosts are
+rejected as ambiguous. A configured host outage currently fails catalog enumeration
+explicitly; it does not silently claim the remaining tasks are a complete list.
+The temporary remote fixture is outside the runtime project allowlist.
+
+
 ## Coordinator acceptance update — 2026-09-21
 
 **Scope:** Owner requested a persistent DingTalk coordinator for open-ended task

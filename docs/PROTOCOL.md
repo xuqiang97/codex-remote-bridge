@@ -399,3 +399,11 @@ Not V1:
 - cross-device routing commands.
 
 Any future command that increases privilege requires a security review first.
+
+## Multiple fixed hosts
+
+Ordinary chat continues the same local coordinator. Task entries include a local
+or configured remote host label; opaque IDs in bindings/ownership carry the host.
+The user can ask about remote projects by name. Dispatch still requires a unique
+exact task title; duplicate names across hosts are rejected rather than guessed.
+Host/path configuration and arbitrary SSH commands are not chat commands.

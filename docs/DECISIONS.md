@@ -403,3 +403,13 @@ DingTalk -> bridge -> existing Codex thread -> new turn -> DingTalk
 ```
 
 on a safe test repository on Windows and macOS.
+
+## Decision 029 — Fixed SSH stdio backends
+
+Owner-approved access to recent remote projects uses one existing local bot
+consumer and a fixed SSH child per configured host. The remote Codex runs as its
+existing OS user/home; no inbound app-server endpoint, second bot deployment,
+credentials copy or cloud relay is added. Python validates remote paths using a
+fixed helper on that OS; arbitrary chat-supplied paths/commands are not accepted.
+Remote IDs are host-qualified in local state. A remote outage currently fails
+catalog enumeration explicitly rather than silently presenting a complete list.

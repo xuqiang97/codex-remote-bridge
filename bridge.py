@@ -4,7 +4,7 @@ import asyncio
 import logging
 from pathlib import Path
 
-from codex_bridge.app_server import AppServer
+from codex_bridge.backends import Backends
 from codex_bridge.config import Config, ConfigError
 from codex_bridge.coordinator import Coordinator
 from codex_bridge.state import State
@@ -13,7 +13,7 @@ from codex_bridge.state import State
 async def run(config):
     from channels.dingtalk import DingTalk
     state = State(config.state_path)
-    app = AppServer(config.command, config.codex_home)
+    app = Backends(config)
     router = Coordinator(config, state, app)
     channel = DingTalk(config, router)
     try:

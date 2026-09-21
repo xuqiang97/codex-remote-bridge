@@ -579,3 +579,13 @@ V1 is complete only when:
 - no public app-server port exists;
 - no real credential is committed;
 - limitations are documented.
+
+## Fixed SSH backend validation
+
+Before enabling a configured remote: verify its executable/version and same OS
+user/home, complete initialize/list/read with stable APIs, confirm a second writer
+is refused, and run a disposable-repository continuity/file canary. Distinguish
+remote stored Desktop read/resume from safe fixture execution in validation records.
+Offline tests must cover host routing, unknown hosts, rejected cwd before history,
+remote native traversal/symlink handling, safe SSH argv, and revalidation before turn.
+Do not install a second DingTalk Stream consumer with the same bot credentials.

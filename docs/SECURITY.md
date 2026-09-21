@@ -384,3 +384,15 @@ Confirm all are true:
 - [ ] tests prove approval requests cannot be accepted;
 - [ ] logs do not contain prompts/secrets/full paths;
 - [ ] real end-to-end validation uses a disposable/safe test repository first.
+
+## Fixed SSH extension
+
+SSH host aliases, executable/home and remote roots are trusted local configuration,
+never message inputs. Known-host verification and BatchMode are mandatory; host-key
+errors fail closed. No port forwarding or SSH agent forwarding. Native remote
+canonicalization rejects missing directories, traversal and symlink escapes before
+history reads/resume, and checks again before starting a turn. A small fixed Python
+path verifier is the only auxiliary remote command. Normal work still goes through
+sandboxed turn/start, never command/exec or thread/shellCommand. Host-qualified IDs
+prevent same-ID cross-host routing. Network/approval restrictions are unchanged.
+Shutdown closes only SSH/app-server processes owned by this bridge.
