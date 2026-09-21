@@ -1,5 +1,25 @@
 # V1 Chat Protocol
 
+## Coordinator protocol revision — 2026-09-21
+
+This supersedes ordinary-message binding rules below. First private chat creates
+`钉钉机器人`; later messages continue that same Codex task. Examples:
+`今天主要有哪些任务？`, `某某任务刚刚的结果是什么？`,
+`请在「完整任务名」任务中执行：检查测试并报告结果。`
+Only allowed projects are visible. Recent results are bounded, not a complete daily
+activity ledger. Ambiguous titles and unsupported instructions ask for clarification.
+Questions never authorize target work.
+
+`/threads` is diagnostic; `/use` and `/unbind` affect legacy selection only, never
+ordinary chat routing. `/current` identifies the coordinator. `/stop` interrupts
+only this conversation's unique bridge-owned turn; no candidates or multiple
+candidates are rejected. Desktop-owned turns cannot be controlled.
+
+A target start acknowledgement follows successful turn/start. Completion sends the
+named final answer via proactive private robot API. Delivery uncertainty is recorded
+without retrying work. Automatic restart reconciliation is not implemented; this limitation must be disclosed.
+
+
 This document defines the user-visible command protocol and the normalized internal channel contract.
 
 V1 channel: DingTalk Stream Mode.
@@ -120,6 +140,11 @@ Never show full thread IDs unless debug/admin mode explicitly requires it.
 Never show full cwd.
 
 ### Index semantics
+
+The implementation also accepts `/threads <page>` for browsing the stored list
+in pages of ten. Global indices remain stable for five minutes; `/threads`
+refreshes the snapshot. Listing is bounded to 100 app-server pages of 100 rows;
+an oversized catalogue fails without publishing a partial selectable snapshot.
 
 The implementation must avoid stale-index surprises.
 

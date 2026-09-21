@@ -1,25 +1,90 @@
 # Validation Record
 
+## Coordinator acceptance update — 2026-09-21
+
+**Scope:** Owner requested a persistent DingTalk coordinator for open-ended task
+queries, work assignment into existing tasks, and proactive completion replies.
+This supersedes the manual `/use` prerequisite. Implementation is an acceptance
+build, not a fully validated release.
+
+### Real local evidence
+
+- Production AppServer client resumed the completed Desktop fixture under the same
+  Windows user/home and recalled its conversation-only marker with the correct
+  arithmetic follow-up (original integer plus thirteen).
+- First sandboxed file-write canary timed out after 120 seconds and was interrupted
+  when the owned child closed. It produced no file; the failure is retained here.
+- A second explicit local canary, with low reasoning effort and a 300-second wait,
+  completed a native commandExecution and created only the requested canary file
+  with the exact expected content. No approval request or elevation was accepted.
+  Existing task model identity was not changed. This was a separate operator test,
+  not an automatic retry of an uncertain DingTalk event.
+- Stable `thread/start` + `thread/name/set` created the persistent `钉钉机器人`
+  task. It returned structured read-only answers based on allowed task summaries.
+- A fresh process reused that same coordinator. It dispatched one verbatim,
+  no-tool follow-up into the existing Desktop fixture; the returned marker and
+  original integer plus seventeen were both correct. The target completed and
+  the router delivered its named final response to the test callback.
+- The first dispatch proposal was safely rejected because an overly broad negative
+  phrase check treated “Do not use tools” inside the work instruction as rejection
+  of dispatch. The check now examines the authorization prefix; an offline regression
+  case covers safety constraints inside the instruction.
+- The official proactive DingTalk private-message API accepted a coordinator-ready
+  notification to the already-authorized initiating user. No invalid/rate-limited
+  recipients were returned. This proves API acceptance, not human reading.
+- The updated Stream bridge reconnected. An actual inbound message -> coordinator
+  -> target -> DingTalk final loop still needs the owner's real chat confirmation.
+  Local router injection must not be reported as that full-channel acceptance.
+
+### Automated checks and limits
+
+All 48 offline tests passed on Windows/Python 3.14.5. Compile checks, configuration
+validation and git diff whitespace checks passed. The release audit scanned 24
+candidate files and all 11 pre-implementation commits for the actual local secret,
+user-ID and personal-path values plus common key patterns: no matches. This is
+a bounded scan, not a guarantee that every possible sensitive string is detected.
+GitHub Actions API reports zero runs; the workflow has not been remotely validated.
+
+The offline suite now covers coordinator creation/reuse, structured stable RPC
+shapes, read-only policy, filtered history, query-vs-dispatch safety, unique targets,
+verbatim instructions, negative/hypothetical messages, duplicate callbacks,
+foreign active ownership, completion reporting, restart unknown outcomes and
+proactive recipient allowlisting/token reuse/rate-limit handling.
+
+Task context is bounded: at most 200 allowed tasks in the coordinator catalog,
+12 recent tasks preloaded with 3 recent final results each. This is not a complete
+all-day activity audit. Ambiguous/unsupported phrasing asks for clarification.
+Restart preserves coordinator/binding/dedupe state and dispatch identifiers, but
+marks interrupted in-flight ownership unknown; it never replays work or automatically
+reconciles missed completion notifications. Query the target again after restart.
+Desktop writer conflicts remain fail-closed. Windows live remote-stop/elevation/
+duplicate-event tests and macOS live acceptance remain outstanding.
+
+
 This file must separate planned checks from checks that were actually executed.
 
 Do not mark V1 complete based only on unit tests.
 
 ## Current status
 
-**No-Go for the tested Desktop-open Windows handoff, 2026-09-20.**
+**2026-09-21: conditional Go for released existing threads; V1 implementation
+is present, final real end-to-end acceptance is pending.**
 
-Phase 0 and the Phase 1 handoff probe were executed. A separate app-server could
-read a completed Desktop test thread, but could not resume it: two fresh-process
-attempts returned `-32600`, `already has an active writer`. No bridge turn was
-started. Full implementation is stopped, as required by the gate and the owner.
+The 2026-09-20 No-Go below remains valid evidence for a Desktop-owned thread.
+On 2026-09-21 the same real test thread was no longer loaded by Desktop and
+could be resumed independently. A real follow-up recalled its conversation-only
+marker and correctly used the original number. The production asynchronous
+client subsequently passed a second continuity canary. No internal state was
+modified to obtain either result. What released Desktop ownership is unknown.
 
-Only this record and README were changed. No DingTalk credentials were requested
-or used. No production bridge, offline suite, or CI workflow was implemented.
-No scope change to bridge-managed threads has been approved.
+The owner reaffirmed existing-task support and authorized implementation for
+other Windows users, plus access to the current project on this machine.
+No bridge-managed-only rescope, force takeover or remote approval is implemented.
+The release still cannot promise availability of every Desktop task at any time.
 
 ## Gate A — Desktop thread -> app-server resume
 
-**Status: FAIL / No-Go in the tested environment.**
+**2026-09-20 result: FAIL while Desktop held the writer.**
 
 ### Environment and provenance
 
@@ -136,9 +201,51 @@ success alone.
 
 This gate must pass before claiming the product can continue an existing Desktop conversation.
 
+### 2026-09-21 repeat: successful existing-thread continuation
+
+Same OS, Python, Codex CLI and Desktop package as above. The app's supported
+task status tool now reported the disposable baseline thread as `notLoaded`,
+with its two original completed turns preserved. No process was stopped and
+no lock, database or rollout was changed to cause this state.
+
+1. A new independent stdio process initialized and read the same stored task.
+2. `thread/resume` with never/workspace-write succeeded and returned idle.
+3. `turn/start` used approvalPolicy=never and sandboxPolicy workspaceWrite,
+   networkAccess=false, no extra writable roots, and excluded temporary roots.
+4. The prompt requested recall of the original codeword and original integer
+   plus nine, without repeating the codeword or integer. Only a text response
+   was requested; tool access was explicitly unnecessary.
+5. The completed agent message returned the exact codeword and `146` (137 + 9).
+   `turn/completed` reported completed, no error, duration 19,459 ms. No tool or
+   approval request occurred. The disposable README/Git state remained unchanged.
+6. After closing the child, Desktop's supported read API displayed the new
+   completed Turn. Its compact item list was empty, so this proves Desktop
+   recognizes the Turn, not a full graphical UI rendering check.
+7. After implementing `codex_bridge/app_server.py`, a separate real canary used
+   that production client, local allowlisted config, `thread/read`,
+   `thread/resume`, and `turn/start`. It requested original integer plus thirteen
+   and got the exact marker with `150`, completed, no denied request. This is
+   a real Codex client test, not an offline test and not a DingTalk inbound test.
+
+**Conclusion:** continuation of a released existing Desktop task is proven on
+this version. Simultaneous takeover of a Desktop-owned task is neither supported
+nor attempted. The earlier idle-writer refusal and active/notLoaded discrepancy
+remain important limits; successful server writer acquisition is required.
+
+Local CLI help also exposed `app-server proxy` and `app-server daemon version`.
+The read-only daemon version query failed on the default control socket with
+OS error 10050. No daemon was started/reconfigured and no alternate hidden
+Desktop socket was accessed. This is not a validated transport alternative.
+
 ## Gate B — Offline automated tests
 
-**Status:** Pending
+**Status:** 48 offline tests passed on local Windows / Python 3.14.5.
+
+Command: `.venv/Scripts/python -m unittest discover -s tests -v`.
+Compile check and `git diff --check` also passed. Protocol tests use in-memory
+fake streams/processes; routing tests use a fake app and fake replies. No real
+Codex, DingTalk, shell or thread store is used. External socket connects are
+blocked; loopback is permitted for Windows asyncio's internal socketpair.
 
 Record:
 
@@ -153,10 +260,10 @@ Record:
 
 **Status:** Pending
 
-No workflow exists at the tested revision. Windows/macOS CI is not run because
-the mandatory pre-implementation gate failed. This is not a passing CI result.
-The public GitHub Actions runs API was checked on 2026-09-20 and returned zero
-workflow runs.
+The workflow now exists at `.github/workflows/ci.yml`, with the required matrix.
+It has not run on GitHub: a fresh push preflight still returns HTTP 403 for the
+locally authenticated account. Do not infer passing CI from local tests.
+The last checked public Actions runs API returned zero workflow runs.
 
 Required matrix:
 
@@ -169,7 +276,43 @@ Record workflow URL/commit and outcome.
 
 ## Gate D — DingTalk Stream
 
-**Status:** Pending
+**Status:** Core private receive/reply passed on Windows, 2026-09-21.
+
+The owner explicitly authorized a standalone robot connectivity test after the
+Desktop handoff No-Go. This does not reopen full V1 implementation or change its
+Codex ownership gate. A bounded local diagnostic uses official `dingtalk-stream`
+0.24.3, Python 3.14.5 and websockets 17.1 in an ignored virtual environment.
+
+Executed results:
+
+- OAuth application-token request: HTTP 200, access token present (not logged).
+- Stream connection-ticket request for the chatbot callback topic: HTTP 200,
+  endpoint and ticket present (not logged).
+- Secure WebSocket connection established successfully.
+- After the owner explicitly supplied their own enterprise UserID and requested
+  a proactive test, send exactly one fixed `sampleText` message using
+  `/v1.0/robot/oToMessages/batchSend`. HTTP 200, processQueryKey present,
+  zero invalid recipients and zero rate-limited recipients. This proves API
+  acceptance, not user-visible delivery. No automatic send retry was used.
+- The supplied stable sender ID is configured only in the ignored local test
+  allowlist. The listener accepts the exact private test challenge from that
+  sender for a single fixed reply; other senders cannot trigger a reply.
+- A real private text callback arrived, matched the exact challenge and the
+  configured sender ID. The fixed session-webhook reply returned HTTP 200 and
+  errcode=0. No Codex was attached to that smoke test. User-visible display of
+  the reply was not independently inspected.
+- SDK raw logging disabled to prevent credentials, tickets or callback bodies
+  entering logs; only explicit diagnostic outcome fields are emitted.
+- Diagnostic accepts no Codex commands and opens no inbound port. It waits up
+  to ten minutes for a private test message. An unapproved sender receives no
+  reply; a local sender/conversation allowlist is required for the fixed test
+  response. No ordinary message content is stored.
+- Diagnostic source, local credentials and any sender identifiers are confined
+  to ignored local files, not tracked files or SQLite.
+
+Not yet verified live: unauthorized-sender canary, forced network reconnect,
+duplicate platform event, or the complete DingTalk-to-Codex-to-DingTalk Turn.
+Authorization/deduplication have offline coverage in the implemented bridge.
 
 Validate with safe bot credentials:
 
@@ -199,6 +342,13 @@ Validate:
 ## Gate F — End-to-end Windows
 
 **Status:** Pending
+
+The implemented Bridge has started successfully with local ignored credentials,
+the owner's allowed user and two explicit allowed roots (current project and
+the disposable test repository). The new Stream connection succeeded. The owner
+was asked to run `/threads`, bind the disposable task and request original
+integer plus eleven. Await actual callback/start/final-response evidence before
+marking this gate passed. Merely starting the bridge is not this gate.
 
 Required path:
 
@@ -246,8 +396,9 @@ This bounded review is not a comprehensive secret-scanner guarantee or V1 runtim
 security acceptance. Local probe outputs and generated schemas are ignored and
 must not be force-added.
 
-`git diff --check` passed for the documentation change. There is no application
-test suite to run at this architecture-only revision.
+At the historical documentation-only revision, `git diff --check` passed and no
+application suite existed. The current implementation has an offline suite; see
+the coordinator update and Gate B for its current validation status.
 
 ### Publication
 

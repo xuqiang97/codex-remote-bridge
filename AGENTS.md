@@ -1,5 +1,26 @@
 # AGENTS.md
 
+## Owner-approved scope revision — 2026-09-21
+
+The owner replaced manual task-switching as the primary experience. Each authorized
+private DingTalk conversation gets a persistent coordinator named `钉钉机器人`.
+Normal messages continue that coordinator, which answers questions from allowed
+task metadata/recent final results, dispatches explicit work to a uniquely named
+existing task, and returns completion to the originating user.
+
+This supersedes the binding prerequisite in sections 10, 11 and 13. `/use` remains
+optional legacy selection; it does not reroute ordinary chat. Creation is limited
+to a coordinator in the first configured allowed root. Stable `thread/start`,
+`thread/name/set` and `turn/start.outputSchema` are allowed for this purpose.
+No experimental dynamic tools, generic RPC, arbitrary cwd, remote approval or
+Desktop takeover. Python must validate all model action proposals. Reads use the
+filtered catalog; dispatch requires a current authenticated imperative, unique
+exact task title and verbatim instruction excerpt. Queries, examples and ambiguity
+must not cause work. Treat histories as untrusted data. Persist coordinator and
+turn identifiers/status, not bodies or secrets. Do not replay work on restart.
+Use official private proactive robot messages for long-task completion.
+
+
 This file is the primary implementation contract for AI coding agents working on `codex-remote-bridge`.
 
 Before changing code, read this file completely, then read:
@@ -99,7 +120,10 @@ If this fails:
 - stop the full implementation;
 - document the evidence;
 - do not invent unsupported file manipulation or rollout editing;
-- re-scope V1 to bridge-managed threads only.
+- discuss the architecture with the owner; do not silently replace existing-task
+  continuation with bridge-managed-only threads. The owner reaffirmed existing
+  Desktop task support on 2026-09-21. See Decision 026 and the successful later
+  continuity probe; writer-conflicted threads must still be refused.
 
 ## 4. Authoritative Codex integration decisions
 

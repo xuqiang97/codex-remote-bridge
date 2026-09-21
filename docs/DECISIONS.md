@@ -1,8 +1,54 @@
 # Architecture and Product Decisions
 
+## Decision 028 — Persistent DingTalk task coordinator
+
+Owner-approved on 2026-09-21. Normal chat must not require manually binding a target.
+Create one persistent coordinator per private conversation. Use stable structured
+turn output and explicitly validated host operations instead of experimental dynamic
+tools or app-specific in-memory tool APIs. This works against each installation's
+own Codex/user/home, without shipping this developer's credentials or paths.
+
+The coordinator may read allowed metadata/recent final answers and request an
+explicitly authorized target turn. Python checks the target and exact current-user
+instruction. DingTalk completion uses the official proactive private message API,
+which avoids session webhook expiry. Restart does not replay work or assume turn
+ownership. Failed/uncertain sends are recorded; automatic reconciliation is pending.
+
+
 This document records settled V1 decisions for `codex-remote-bridge`.
 
 Future contributors may change them only with new evidence and corresponding documentation updates.
+
+## Decision 026 — Existing threads remain the product; writer conflicts fail closed
+
+**Status:** Accepted, 2026-09-21 owner clarification and successful continuity probe.
+
+The product must continue existing Desktop tasks for independent Windows users.
+Do not replace this with bridge-created-only tasks. The previous No-Go was real
+for a Desktop-loaded idle thread. The same test thread later became available
+and passed `thread/resume` plus `turn/start` with conversation-only recall.
+The action that released Desktop ownership was not established.
+
+Preserve the independent local stdio app-server architecture. List all eligible
+tasks with bounded pagination (`/threads [page]`). A list/read status of
+`notLoaded` is not cross-client ownership proof. `thread/resume` must succeed
+under the server's writer exclusion before starting a turn; reject ownership
+errors without retry, force-unlock, UI automation or hidden-state access.
+Loaded Desktop tasks may remain unavailable even after their turn completes.
+This is a documented product limitation, not universal task availability.
+
+The bridge keeps one local app-server process. It can hold a resumed thread's
+writer until shutdown; stop the bridge before returning to that thread in
+Desktop if Desktop reports an ownership conflict. `/unbind` only removes the
+chat mapping. It does not unload, archive, interrupt or delete the thread.
+
+## Decision 027 — Portable, per-user configuration
+
+Each installation uses its own native Codex executable, OS user, Codex home,
+DingTalk bot identity, user allowlist and JSON-array project-root allowlist.
+No real values are part of the repository or release. No centralized service,
+shared developer bot or machine-specific paths are required. Remote SSH/cloud
+tasks visible in Desktop are not local threads supported by this release.
 
 ## Decision 001 — Separate project from codex-notify
 

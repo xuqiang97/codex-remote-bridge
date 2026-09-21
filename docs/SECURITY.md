@@ -1,5 +1,23 @@
 # Security Model
 
+## Coordinator security revision — 2026-09-21
+
+Ordinary chat uses a dedicated read-only coordinator with approval never. Target
+work remains workspace-write with network disabled. The coordinator is instructed
+to use supplied context and structured output, not tools. That instruction is not
+OS isolation; sandbox and approval refusal remain necessary. Task-root filtering
+controls host-provided metadata, not every possible local file read.
+
+Python validates targets and current-user authorization. Dispatch requires a unique
+exact title and verbatim instruction excerpt; ambiguous or unsupported phrasing
+asks for clarification. Histories/titles are untrusted data. Model-proposed RPCs,
+paths and tool results are never interpreted as bridge operations. Redaction is
+best effort, not DLP. Codex coordinator history contains selected task results;
+SQLite stores identifiers/status only. Proactive messages target only the initiating
+allowlisted private user. Platform acknowledgement is not proof of human receipt.
+Restart does not confer ownership and must not replay work.
+
+
 `codex-remote-bridge` is remote-control software for a local coding agent.
 
 A chat message can cause Codex to read and modify files inside a workspace. Treat every design decision accordingly.
@@ -188,6 +206,13 @@ Rules:
 Chat output should show only a project basename/alias, never the full path.
 
 ## 11. Existing-thread handoff safety
+
+Validated on 2026-09-21: an independent process can report `notLoaded` even
+while Desktop owns the thread. This is not permission to start. The bridge
+must successfully acquire the server's writer via `thread/resume`; an
+`already has an active writer` error is a hard refusal. No force takeover or
+automatic retry is allowed. Compatibility must be revalidated if a Codex
+version does not preserve this exclusion. See VALIDATION for the bounded test.
 
 The target use case is a thread whose previous Desktop turn has completed.
 

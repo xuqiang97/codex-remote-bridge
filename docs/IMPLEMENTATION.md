@@ -1,5 +1,27 @@
 # V1 Implementation Plan
 
+## Coordinator acceptance revision — 2026-09-21
+
+The owner now requests persistent coordinator chat, task queries, explicit work
+assignment to existing tasks, and completion notifications. Original phases below
+remain the transport foundation; their binding prerequisite is superseded.
+
+1. Pass Desktop continuity and sandboxed file-write canaries.
+2. Create/name/reuse a coordinator per authorized private conversation via stable APIs.
+3. Supply filtered metadata and bounded recent results; mark incomplete history.
+4. Validate structured read/dispatch/reply proposals in Python. No generic RPC or
+   experimental tools; no target side effect from questions or ambiguous names.
+5. Dispatch verbatim authorized work after root/idle/writer checks; persist IDs/status.
+6. Send actual completion via official proactive private messages; record delivery
+   uncertainty without replaying work.
+7. Test dedupe, restart, unknown outcomes, foreign ownership, malformed proposals,
+   forged targets, history injection and delivery failure.
+8. Verify actual DingTalk -> coordinator -> existing task -> completion on both OSes.
+   Local router injection is not a real inbound DingTalk test.
+
+Keep the acceptance-build label until remaining real platform gates are completed. Restart notification reconciliation is a documented limitation.
+
+
 Read `AGENTS.md` and `SECURITY.md` first.
 
 This plan is intentionally phased. Do not skip the handoff validation and jump directly to DingTalk bot work.
