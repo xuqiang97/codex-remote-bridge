@@ -2,7 +2,7 @@
 
 在钉钉里使用一个固定的 Codex 总助理：查询本机任务、了解结果、向指定任务安排工作，并接收完成通知。每位用户在自己的电脑、OS 账号和 Codex Home 下运行；不需要公网 IP、云中转或开发者的机器人凭据。
 
-> **总助理验收版本，尚未正式发布。** Windows 已通过真实钉钉任务查询、总助理向旧任务派发指令及完成通知，用户确认收到了汇总和完成回复；Desktop 上下文续接及安全测试库写文件也已验证。CI、macOS 和部分安全真机测试尚未完成。Desktop 仍持有 writer 的任务会被拒绝，即使上一轮已结束；不能承诺“所有任务随时接管”。[实际验证记录](docs/VALIDATION.md)列出了证据和限制。
+> **总助理验收版本，尚未正式发布。** Windows 已通过真实钉钉任务查询、总助理向旧任务派发指令及完成通知，用户确认收到了汇总和完成回复；Desktop 上下文续接及安全测试库写文件也已验证。Windows/macOS × Python 3.10/3.14 CI 已全部通过；macOS 和部分安全真机测试尚未完成。Desktop 仍持有 writer 的任务会被拒绝，即使上一轮已结束；不能承诺“所有任务随时接管”。[实际验证记录](docs/VALIDATION.md)列出了证据和限制。
 
 ```text
 钉钉私聊 → Stream → Python Bridge → 本机 codex app-server（stdio）
@@ -143,7 +143,7 @@ python -m compileall -q bridge.py codex_bridge channels tests
 git diff --check
 ```
 
-测试使用假的协议进程和通道，不调用真实 Codex/钉钉，不运行 shell 或修改真实任务存储。禁止外部网络，仅允许 Windows asyncio 内部 socketpair 所需的 loopback。CI 配置为 Windows/macOS × Python 3.10/3.14；工作流文件存在不代表已运行通过。
+测试使用假的协议进程和通道，不调用真实 Codex/钉钉，不运行 shell 或修改真实任务存储。禁止外部网络，仅允许 Windows asyncio 内部 socketpair 所需的 loopback。Windows/macOS × Python 3.10/3.14 四组 CI 已实际运行通过，记录见 [CI 验证](docs/VALIDATION.md#gate-c--public-ci)。CI 不代替真实钉钉和 Desktop 验收。
 
 `codex_bridge/app_server.py`：异步协议；`router.py`：指令与所有权；`coordinator.py`：持久总助理、任务查询与派发；`security.py`：目录与输出；`state.py`：SQLite；`config.py`：本地配置；`channels/dingtalk.py`：Stream。
 
