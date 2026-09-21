@@ -30,7 +30,11 @@ No credentials or private paths are needed in the public implementation.
 - All 56 offline tests passed locally, including the remote path helper, traversal/
   symlink escapes, host-qualified IDs, unknown-host refusal, no history before
   authorization, revalidation before turn and fixed SSH argv without forwarding.
-  Compile and whitespace checks passed. CI for this extension is pending push.
+  Compile and whitespace checks passed. All four Windows/macOS × Python 3.10/3.14
+  jobs passed in [run 35578959875](https://github.com/xuqiang97/codex-remote-bridge/actions/runs/35578959875)
+  for implementation commit `cd87229`. A post-commit audit covered 26 public files
+  and all 16 commits, including exact local secret/user/path and remote address/root
+  values: zero matches. This bounded check is not a universal DLP guarantee.
 
 Remote task execution remains subject to writer ownership, conservative sandbox,
 approval denial and per-thread locks. Identically named tasks across hosts are
