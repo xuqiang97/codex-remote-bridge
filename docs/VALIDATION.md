@@ -32,9 +32,15 @@ build, not a fully validated release.
 - The official proactive DingTalk private-message API accepted a coordinator-ready
   notification to the already-authorized initiating user. No invalid/rate-limited
   recipients were returned. This proves API acceptance, not human reading.
-- The updated Stream bridge reconnected. An actual inbound message -> coordinator
-  -> target -> DingTalk final loop still needs the owner's real chat confirmation.
-  Local router injection must not be reported as that full-channel acceptance.
+- The updated Stream bridge reconnected. The owner sent a real task-summary
+  question from DingTalk and explicitly confirmed receiving the task summary.
+- The owner then sent a real instruction asking the coordinator to continue the
+  Desktop fixture with a no-tool fixed reply. The runtime recorded the callback
+  and target completion; the owner explicitly confirmed receiving both the
+  dispatch acknowledgement and the completion notification in DingTalk.
+  Thus the basic Windows full-channel coordinator flow passed. Earlier local
+  router injection remains separately identified rather than counted as inbound
+  DingTalk evidence.
 
 ### Automated checks and limits
 
@@ -43,7 +49,10 @@ validation and git diff whitespace checks passed. The release audit scanned 24
 candidate files and all 11 pre-implementation commits for the actual local secret,
 user-ID and personal-path values plus common key patterns: no matches. This is
 a bounded scan, not a guarantee that every possible sensitive string is detected.
-GitHub Actions API reports zero runs; the workflow has not been remotely validated.
+After implementation commit, the same bounded audit scanned all 12 commits with
+no matches. GitHub Actions API reports zero runs; the workflow has not been
+remotely validated. Actual push of the implementation was rejected with HTTP 403
+because the locally authenticated account lacks repository write permission.
 
 The offline suite now covers coordinator creation/reuse, structured stable RPC
 shapes, read-only policy, filtered history, query-vs-dispatch safety, unique targets,
@@ -341,14 +350,18 @@ Validate:
 
 ## Gate F — End-to-end Windows
 
-**Status:** Pending
+**Status:** Basic coordinator end-to-end PASS, 2026-09-21; remaining safety cases pending.
 
-The implemented Bridge has started successfully with local ignored credentials,
-the owner's allowed user and two explicit allowed roots (current project and
-the disposable test repository). The new Stream connection succeeded. The owner
-was asked to run `/threads`, bind the disposable task and request original
-integer plus eleven. Await actual callback/start/final-response evidence before
-marking this gate passed. Merely starting the bridge is not this gate.
+With ignored local credentials, the authorized private user, and two allowed roots
+(current project and disposable fixture), the owner confirmed receiving a real
+task summary and then both dispatch acknowledgement and final completion for a
+real DingTalk instruction. One persistent named coordinator was verified through
+supported app-server reads. The runtime recorded target completion. See the dated
+coordinator update above for local-only versus actual-channel evidence.
+
+Live unauthorized-sender, duplicate-event, `/stop`, forbidden-elevation and restart
+channel cases have not all been exercised. Their offline coverage is not a claim
+of full real-environment safety acceptance.
 
 Required path:
 
